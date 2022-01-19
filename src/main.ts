@@ -1,5 +1,6 @@
 import '@app/style.css';
 
+import Cells from '@app/Cells';
 import Board from '@app/Board';
 import BoardControls from '@app/Controls/BoardControls';
 
@@ -15,21 +16,6 @@ function resizeCanvas(
   context.clearRect(0, 0, width, height);
 }
 
-function getCells(dimensions: [number, number]) : number[][] {
-  const generateRow: any = () : number[] =>
-    [...Array(dimensions[0])]
-      .reduce(
-        (row: number[]) : number[] => [...row, Math.random() < 0.5 ? 0 : 1],
-        []
-      );
-
-  return [...Array(dimensions[1])]
-    .reduce(
-      (board: number[][]) : number[][] => [...board, generateRow()],
-      []
-    );
-}
-
 window.addEventListener('load', () => {
   const canvas: HTMLCanvasElement = document.querySelector('#scene');
   if (!canvas) return;
@@ -42,9 +28,18 @@ window.addEventListener('load', () => {
 
   resizeCanvas(canvas, context, height, width);
 
-  let resolution: number = 10; // 1 point = 10px x 10px
+  let resolution: number = 100; // 1 point = 10px x 10px
   let boardDimensions: [number, number] = Board.getBoardDimension(height, width, resolution);
-  let cells: number[][] = getCells(boardDimensions);
+  let cells: number[][] = Cells.getCells(boardDimensions);
+  let shadowCells: number[][] = cells; // keep state for cells that have been alive at least once
+  const updateBoard: any = (): void => {
+    context.clearRect(0, 0, width, height);
+    Board.drawCells(
+      context,
+      cells,
+      resolution
+    );
+  };
 
   context.fillStyle = 'red';
   Board.drawCells(
@@ -53,6 +48,25 @@ window.addEventListener('load', () => {
     resolution
   );
 
+  const loop: any = setInterval((): void => {
+    const cellsClone: number[][] = JSON.parse(JSON.stringify(cells)); // do not copy reference
+
+    Cells.updateCells(cells, shadowCells, cellsClone);
+
+    if (JSON.stringify(cells) === JSON.stringify(cellsClone)) {
+      clearInterval(loop);
+      // eslint-disable-next-line
+      console.log('Done.');
+
+      return;
+    }
+
+    cells = cellsClone;
+
+    updateBoard();
+  }, 2000);
+
+  // Controls (to move)
   const controls: HTMLElement = BoardControls.initControls(boardDimensions, resolution);
   const resolutionControl: HTMLElement = controls.querySelector('input[name="resolution"]');
   const infoControl: HTMLElement = controls.querySelector('.board-controls__info');
@@ -66,19 +80,14 @@ window.addEventListener('load', () => {
     resolution = Number(event.target.value);
     boardDimensions = Board.getBoardDimension(height, width, resolution);
     // start a loader here
-    cells = getCells(boardDimensions);
+    cells = Cells.getCells(boardDimensions);
+    shadowCells = cells;
     // remove loader here
 
     resolutionReadControl.value = String(resolution);
     heightReadControl.value = String(boardDimensions[1]);
     widthReadControl.value = String(boardDimensions[0]);
 
-    context.clearRect(0, 0, width, height);
-
-    Board.drawCells(
-      context,
-      cells,
-      resolution
-    );
+    updateBoard();
   });
 });
