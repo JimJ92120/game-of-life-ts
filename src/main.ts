@@ -48,6 +48,7 @@ window.addEventListener('load', () => {
     resolution
   );
 
+  // change with `requestAnimationFrame()`
   const loop: any = setInterval((): void => {
     const cellsClone: number[][] = JSON.parse(JSON.stringify(cells)); // do not copy reference
 
@@ -55,8 +56,7 @@ window.addEventListener('load', () => {
 
     if (JSON.stringify(cells) === JSON.stringify(cellsClone)) {
       clearInterval(loop);
-      // eslint-disable-next-line
-      console.log('Done.');
+      alert('Done.');
 
       return;
     }
