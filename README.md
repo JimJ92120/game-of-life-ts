@@ -3,6 +3,9 @@ A Game of Life in TypeScript.
 
 Rules can be found on [`here`](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).  
 
+Game initial states randomly fills the whole board with cells (either `0` or `1`).  
+Once game can no longer be updated, an `alert` will pop up.  
+
 [`view`](https://jimj92120.github.io/game-of-life-ts/).  
 
 ---
