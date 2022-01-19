@@ -21,13 +21,13 @@ function initInfoControl(
   return control;
 }
 
-function initResolutionControl() : HTMLElement {
+function initResolutionControl(resolution: number): HTMLElement {
   const control: HTMLElement = document.createElement('div');
 
   control.classList.add('board-controls__resolution');
   control.innerHTML = `
     <label for="resolution">Resolution</label>
-    <input type="range" name="resolution" min="1" max="100" step="1" value="1">
+    <input type="range" name="resolution" min="1" max="100" step="1" value="${resolution}">
   `;
 
   return control;
@@ -60,7 +60,7 @@ function initControls(
     </style>
   `;
 
-  const resolutionControl: HTMLElement = initResolutionControl();
+  const resolutionControl: HTMLElement = initResolutionControl(resolution);
   const infoControl: HTMLElement = initInfoControl(dimensions, resolution);
 
   controls.appendChild(resolutionControl);
